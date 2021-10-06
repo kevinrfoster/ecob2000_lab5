@@ -1,30 +1,19 @@
 Lab 5
 ================
 
-<p style="color:rgb(182,18,27);font-family:corbel">
+### Econ B2000, MA Econometrics
 
-Econ B2000, MA Econometrics
+### Kevin R Foster, the Colin Powell School at the City College of New York, CUNY
 
-</p>
-
-<p style="color:rgb(182,18,27);font-family:corbel">
-
-Kevin R Foster, the Colin Powell School at the City College of New York,
-CUNY
-
-</p>
-
-<p style="color:rgb(182,18,27);font-family:corbel">
-
-Fall 2020
-
-</p>
+### Fall 2021
 
 For this lab, we improve some of our regression models to explain wages.
 
-Work with a group to prepare a 4-min presentation by one of the group
-members about their experiment process and results. You get 45 min to
-prepare.
+*Note that since exam is next week, this lab will not turn into
+homework.*
+
+Work with a group to prepare a 5-min presentation by one of the group
+members about experiment process and results. You get 75 min to prepare.
 
 Build on the previous lab in creating useful models.
 
@@ -40,8 +29,8 @@ detach()
 ```
 
 *Although, really, you should make sure you know what each one of those
-restrictions is doing – from exam, I saw that most did not know because
-they had skipped the first rule of analysis, “Know your data”.*
+restrictions is doing – recall the first rule of analysis, “Know your
+data”. So some simple summary stats would be good here.*
 
 Your group should pick a different subset.
 
