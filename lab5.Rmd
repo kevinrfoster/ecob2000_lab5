@@ -30,7 +30,7 @@ Your group should pick a different subset.
 Try a regression with age and age-squared in addition to your other controls, something like this:
 
 ```{r eval=FALSE}
-lm((WSAL_VAL ~ Age + I(Age^2) + ... ) )
+lm((INCWAGE ~ Age + I(Age^2) + ... ) )
 
 ```
 
@@ -46,7 +46,7 @@ What is difference in regression from using log wage as the dependent variable? 
 
 Try some interactions, like this,
 ```{r eval=FALSE}
-lm(WSAL_VAL ~ Age + I(Age^2) + female + I(female*Age) + I(female*(Age^2) + ... ) 
+lm(INCWAGE ~ Age + I(Age^2) + female + I(female*Age) + I(female*(Age^2) + ... ) 
 ```
 and explain those outputs (different peaks for different groups).
 

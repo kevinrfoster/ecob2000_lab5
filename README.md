@@ -38,7 +38,7 @@ Try a regression with age and age-squared in addition to your other
 controls, something like this:
 
 ``` r
-lm((WSAL_VAL ~ Age + I(Age^2) + ... ) )
+lm((INCWAGE ~ Age + I(Age^2) + ... ) )
 ```
 
 What is the peak of predicted wage? What if you add higher order
@@ -69,7 +69,7 @@ log wage). Discuss.
 Try some interactions, like this,
 
 ``` r
-lm(WSAL_VAL ~ Age + I(Age^2) + female + I(female*Age) + I(female*(Age^2) + ... ) 
+lm(INCWAGE ~ Age + I(Age^2) + female + I(female*Age) + I(female*(Age^2) + ... ) 
 ```
 
 and explain those outputs (different peaks for different groups).
