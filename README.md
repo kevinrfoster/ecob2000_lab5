@@ -17,6 +17,44 @@ members about experiment process and results. You get 75 min to prepare.
 
 Build on the previous lab in creating useful models.
 
+### Note on coding
+
+First a note to advance your coding. The following bits of code do the
+same thing:
+
+``` r
+attach(acs2017_ny)
+model_v1 <- lm(INCWAGE ~ AGE)
+detach()
+
+model_v2 <- lm(acs2017_ny$INCWAGE ~ acs2017_ny$AGE)
+
+model_v3 <- lm(INCWAGE ~ AGE, data = acs2017_ny)
+```
+
+I prefer the last one, v3. I think v2 is too verbose (especially once
+you have dozens of variables in your model) while v1 is liable to errors
+since, if the `attach` command gets too far separated from the `lm()`
+within your code chunks, can have unintended consequences. Later you
+will be doing robustness checks, where you do the same regression on
+slightly different subsets. (For example, compare a model fit on all
+people 18-65 vs people 25-55 vs other age ranges.) In that case v3
+becomes less verbose as well as less liable to have mistakes.
+
+However specifying the dataset, as with v3, means that any preliminary
+data transformations should modify the original dataset. So if you
+create `newvarb <- f(oldvarb)`, you have to carefully set
+`dataset$newvarb <- f(dataset$oldvarb)` and think about which dataset
+gets that transformation. The coding forces you to think about which
+dataset gets the transformation, which is good.
+
+While we’ve been using ‘attach’ and ‘detach’ up to this point (and, whew
+boy, everybody has had trouble with cleaning up *detach* after a bunch
+of *attach* commands!) I think it’s time to take off the training wheels
+and rampdown your use of ‘attach’ and ‘detach’.
+
+### Back to Lab
+
 Concentrate on a smaller subset than previous. For instance if you
 wanted to look at wages for Hispanic women with at least a college
 degree, you might use
