@@ -4,7 +4,7 @@ output: github_document
 ---
 ### Econ B2000, MA Econometrics
 ### Kevin R Foster, the Colin Powell School at the City College of New York, CUNY
-### Fall 2021
+### Fall 2022
 
 For this lab, we improve some of our regression models to explain wages.
 

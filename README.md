@@ -5,7 +5,7 @@ Lab 5
 
 ### Kevin R Foster, the Colin Powell School at the City College of New York, CUNY
 
-### Fall 2021
+### Fall 2022
 
 For this lab, we improve some of our regression models to explain wages.
 
@@ -42,18 +42,24 @@ lm((INCWAGE ~ Age + I(Age^2) + ... ) )
 ```
 
 What is the peak of predicted wage? What if you add higher order
-polynomials of age, such as \(Age^3\) or \(Age^4\)? Do a hypothesis test
-of whether all of those higher-order polynomial terms are jointly
-significant. Describe the pattern of predicted wage as a function of
-age. What if you used \(log(Age)\)? (And why would polynomials in
-\(log(Age)\) be useless? Experiment.)
+polynomials of age, such as
+![Age^3](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;Age%5E3 "Age^3")
+or
+![Age^4](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;Age%5E4 "Age^4")?
+Do a hypothesis test of whether all of those higher-order polynomial
+terms are jointly significant. Describe the pattern of predicted wage as
+a function of age. What if you used
+![log(Age)](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;log%28Age%29 "log(Age)")?
+(And why would polynomials in
+![log(Age)](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;log%28Age%29 "log(Age)")
+be useless? Experiment.)
 
-Recall about how dummy variables work. If you added educ\_hs in a
+Recall about how dummy variables work. If you added educ_hs in a
 regression using the subset given above, what would that do?
 (Experiment, if you aren’t sure.) What is interpretation of coefficient
-on *educ\_college* in that subset? What would happen if you put both
-*educ\_college* and *educ\_advdeg* into a regression? Are your other
-dummy variables in the regression working sensibly with your selection
+on *educ_college* in that subset? What would happen if you put both
+*educ_college* and *educ_advdeg* into a regression? Are your other dummy
+variables in the regression working sensibly with your selection
 criteria?
 
 Why don’t we use polynomial terms of dummy variables? Experiment.
