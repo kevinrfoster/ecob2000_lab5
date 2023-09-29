@@ -5,7 +5,7 @@ Lab 5
 
 ### Kevin R Foster, the Colin Powell School at the City College of New York, CUNY
 
-### Fall 2022
+### Fall 2023
 
 For this lab, we improve some of our regression models to explain wages.
 
@@ -48,8 +48,8 @@ create `newvarb <- f(oldvarb)`, you have to carefully set
 gets that transformation. The coding forces you to think about which
 dataset gets the transformation, which is good.
 
-While we’ve been using ‘attach’ and ‘detach’ up to this point (and, whew
-boy, everybody has had trouble with cleaning up *detach* after a bunch
+While we’ve used ‘attach’ and ‘detach’ previously (and, whew boy,
+everybody sometimes has trouble with cleaning up *detach* after a bunch
 of *attach* commands!) I think it’s time to take off the training wheels
 and rampdown your use of ‘attach’ and ‘detach’.
 
@@ -68,7 +68,8 @@ detach()
 
 *Although, really, you should make sure you know what each one of those
 restrictions is doing – recall the first rule of analysis, “Know your
-data”. So some simple summary stats would be good here.*
+data”. Check the codebook (in the zip or also in this repo for your
+convenience). Some simple summary stats would be good here.*
 
 Your group should pick a different subset.
 
@@ -80,17 +81,11 @@ lm((INCWAGE ~ Age + I(Age^2) + ... ) )
 ```
 
 What is the peak of predicted wage? What if you add higher order
-polynomials of age, such as
-![Age^3](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;Age%5E3 "Age^3")
-or
-![Age^4](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;Age%5E4 "Age^4")?
-Do a hypothesis test of whether all of those higher-order polynomial
-terms are jointly significant. Describe the pattern of predicted wage as
-a function of age. What if you used
-![log(Age)](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;log%28Age%29 "log(Age)")?
-(And why would polynomials in
-![log(Age)](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;log%28Age%29 "log(Age)")
-be useless? Experiment.)
+polynomials of age, such as $Age^3$ or $Age^4$? Do a hypothesis test of
+whether all of those higher-order polynomial terms are *jointly*
+significant. Describe the pattern of predicted wage as a function of
+age. What if you used $log(Age)$? (And why would polynomials in
+$log(Age)$ be useless? Experiment.)
 
 Recall about how dummy variables work. If you added educ_hs in a
 regression using the subset given above, what would that do?

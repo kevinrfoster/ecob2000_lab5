@@ -4,7 +4,7 @@ output: github_document
 ---
 ### Econ B2000, MA Econometrics
 ### Kevin R Foster, the Colin Powell School at the City College of New York, CUNY
-### Fall 2022
+### Fall 2023
 
 For this lab, we improve some of our regression models to explain wages.
 
@@ -30,7 +30,7 @@ I prefer the last one, v3. I think v2 is too verbose (especially once you have d
 
 However specifying the dataset, as with v3, means that any preliminary data transformations should modify the original dataset. So if you create `newvarb <- f(oldvarb)`, you have to carefully set `dataset$newvarb <- f(dataset$oldvarb)` and think about which dataset gets that transformation. The coding forces you to think about which dataset gets the transformation, which is good.
 
-While we've been using 'attach' and 'detach' up to this point (and, whew boy, everybody has had trouble with cleaning up *detach* after a bunch of *attach* commands!) I think it's  time to take off the training wheels and rampdown your use of 'attach' and 'detach'.
+While we've used 'attach' and 'detach' previously (and, whew boy, everybody sometimes has trouble with cleaning up *detach* after a bunch of *attach* commands!) I think it's  time to take off the training wheels and rampdown your use of 'attach' and 'detach'.
 
 ### Back to Lab
 Concentrate on a smaller subset than previous. For instance if you wanted to look at wages for Hispanic women with at least a college degree, you might use
@@ -42,7 +42,7 @@ dat_use <- subset(acs2017_ny,use_varb) #
 detach()
 ```
 
-*Although, really, you should make sure you know what each one of those restrictions is doing -- recall the first rule of analysis, "Know your data". So some simple summary stats would be good here.*
+*Although, really, you should make sure you know what each one of those restrictions is doing -- recall the first rule of analysis, "Know your data". Check the codebook (in the zip or also in this repo for your convenience). Some simple summary stats would be good here.*
 
 Your group should pick a different subset.
   
@@ -53,7 +53,7 @@ lm((INCWAGE ~ Age + I(Age^2) + ... ) )
 
 ```
 
-What is the peak of predicted wage? What if you add higher order polynomials of age, such as $Age^3$ or $Age^4$? Do a hypothesis test of whether all of those higher-order polynomial terms are jointly significant. Describe the pattern of predicted wage as a function of age. What if you used $log(Age)$? (And why would polynomials in $log(Age)$ be useless? Experiment.)
+What is the peak of predicted wage? What if you add higher order polynomials of age, such as $Age^3$ or $Age^4$? Do a hypothesis test of whether all of those higher-order polynomial terms are *jointly* significant. Describe the pattern of predicted wage as a function of age. What if you used $log(Age)$? (And why would polynomials in $log(Age)$ be useless? Experiment.)
 
 Recall about how dummy variables work. If you added educ_hs in a regression using the subset given above, what would that do? (Experiment, if you aren't sure.) What is interpretation of coefficient on *educ_college* in that subset? What would happen if you put both *educ_college* and *educ_advdeg* into a regression? Are your other dummy variables in the regression working sensibly with your selection criteria?
 
