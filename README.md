@@ -1,4 +1,4 @@
-Lab 4
+Lab 5
 ================
 
 ### Econ B2000, MA Econometrics
@@ -7,133 +7,220 @@ Lab 4
 
 ### Fall 2025
 
-Start in small groups and consider a very simple model, where we
-consider to what degree a student’s previous grade predicts their
-subsequent grade, for instance in Principles of Microeconomics and then
-in Intermediate Microeconomics.
+For this lab, we improve some of our regression models to explain wages.
 
-``` math
+*Note that since exam is next week, this lab will not turn into
+homework.*
 
-SubsequentGrade = f(PreviousGrade) + \epsilon 
-```
-With the group, please sketch what you would expect that function to
-look like. Is it reasonable for that to be a line? Would you think it
-had some curve? Would you expect it to be an increasing function? If it
-were a line, what would you expect to be reasonable values of alpha and
-beta here?
-
-``` math
-
-SubsequentGrade = \alpha + \beta PreviousGrade + \epsilon 
-```
-
-Each group will talk about their proposed model.
-
-Next, groups will create linear regression models of wages, in an
-attempt to understand the importance of a college degree. These sort of
-regressions are commonly called “Mincer” models after Jacob Mincer who
-developed them.
-
-We will use the Household Pulse Survey data. Which is not ideal since
-earnings are grouped together – but the tradeoff would be to reacquaint
-yourself with a different dataset. (later in the course)
-
-Groups should prepare a 4-min presentation by one of the group members
-about their experiment process and results. You get 85 min to prepare.
-Next homework assignment will ask you to go deeper.
-
-Make sure you’re stepping up your coding – at minimum, by now you should
-have your code as R-Script (in top left panel of R Studio) so that you
-can easily see what you run (CTRL-Enter is an easy shortcut). If you get
-significant errors then stop and re-run your code from a fresh start
-(clear memory, re-load data) so that you don’t pile one mistake on top
-of another. When you submit homework, I’ll want to see a file with your
-code and another with the output from that code. It would be even better
-to submit an R-Markdown file with code and text, where text tells the
-story clearly, along with that output – but I understand that not
-everybody is that far along yet.
-
-As you begin the analysis, you should first consider what subgroup to
-use – for example, you could run code like this,
+We will use a new dataset, the American Community Survey (ACS) from the
+US Census, from 2021. I put it on class Slack. Note that for this data
+you need an additional package, ‘haven’. This data includes information
+on college students’ choices of major.
 
 ``` r
-prime_age_laborforce_data <- d_HHP2020_24 %>% filter(!is.na(work_kind) &
-                                                          Age >= 25 & Age <= 55)
+library(ggplot2)
+library(tidyverse)
+library(haven)
+library(viridis)
+
+setwd("..//ACS_2021_PUMS//") # your directory structure will be different
+load("acs2021_recoded.RData")
 ```
 
-This selects people 25-55 (often called prime age) who are working.
-Otherwise the regression would be trying to explain why so many people
-make zero wages despite so many qualifications. (Think through: if you
-include retirees in the data and estimate a linear model of age
-affecting wage, what would you expect for the sign of the coefficient on
-age?)
-
-Make sure you run `summary()` to check for obvious mistakes. Maybe some
-crosstabs to also look.
-
-First, *before running a regression,* consider what variables should be
-in your model. What are some of the important factors that influence a
-person’s wage? Is there a plausible causal link from X variables to Y
-and not the reverse?
-
-Now try a linear regression, with wage as the dependent variable,
-education, age, and other variables of your choice.
-
-Here is some sample code,
+This is a rather big file, with 3,252,599 observations. Run something
+like this, to get a sense of what’s there.
 
 ``` r
-model_1 <- lm(income_midpoint ~ Age + Gender + Education + Race + Hispanic, 
-              data = prime_age_laborforce_data)
-summary(model_1)
-
-# maybe get fancy
-library(modelsummary)
-modelsummary(model_1, stars = TRUE, gof_map = c("nobs", "r.squared"))
+summary(acs2021)
 ```
 
-For many of the hypothesis tests, you’ll want the AER package
+### Note on dataset usage
+
+Depending on your computer, that dataset might really slow down
+everything if it’s too big. So you can take a subsample. But you have
+choices about how to do that so you need to pick the one that’s
+appropriate.
+
+One option is to just take a random subsample, for instance, here we
+randomly select 50% of the observations:
 
 ``` r
-library(AER)
+set.seed(12345)
+NN_obs <- length(acs2021$AGE)
+select1 <- (runif(NN_obs) < 0.50)
+smaller_data <- subset(acs2021,select1)
 ```
 
-Consider some predicted values.
+But that might not be a very smart option if we’re only going to be
+looking at a particular group of people. For this lab, we’ll be looking
+at how college major affects wages so … let’s first drop people who
+don’t have a college major coded (including all the people who didn’t
+get a college degree), for instance,
 
 ``` r
-# change this line to fit your choices about explanatory variables
-to_be_predicted1 <- data.frame(Age = 25:55, Gender = "female",
-                               Education = "adv degree",
-                               Race = "Black", 
-                               Hispanic = "Hispanic")
-to_be_predicted1$yhat <- predict(model_1, newdata = to_be_predicted1)
+acs_coll <- acs2021 %>% filter(DEGFIELD != "N/A")
 ```
 
-Create some more, for different X-values.
+Now that has just 867,623 observations, a bit more than 1/4 of the size.
+If needed, you can first choose a filter and then make a random
+subsample of those. Then you can delete the big data from current
+working memory and your computer won’t be as pokey and slow.
 
-Note that R makes it really really easy to run a regression model. You
-should quickly be thinking like an economist and noting that easy things
-don’t get much value – you’ll need to be able to do hard things, to
-create value.
+You might want a smaller subsample. Maybe something like this,
 
-Carefully explain the hypothesis tests of each coefficient and all of
-the coefficients jointly. For each coefficient, explain the t-stat,
-p-value, and confidence interval.
+``` r
+acs_subgroup <- acs2021 %>% filter((AGE >= 25) & (AGE <= 55) & 
+                                     (LABFORCE == 2) & 
+                                     (WKSWORK2 > 4) & 
+                                     (UHRSWORK >= 35) &
+                                     (Hispanic == 1) & 
+                                     (female == 1) & 
+                                     ((educ_college == 1) | (educ_advdeg == 1)))
+```
 
-You might show how heteroskedasticity-consistent standard errors, as
-with `coeftest(model1,vcovHC)`, would affect each of these.
+Which would be people between 25 and 55 (so-called prime age), who are
+in the labor force, working full year, usually fulltime, who are
+Hispanic females with a college degree. If you start from a really big
+dataset, then you can drill far down.
 
-Try both `lm(income_midpoint ~ ...` and `lm(log(income_midpoint) ~ ...`
-Compare mean of predicted values of first version with exp(x) mean of
-predicted values of second version. Discuss.
+*Although, really, you should make sure you know what each one of those
+restrictions is doing – recall the first rule of analysis, “Know your
+data”. Check the codebook (in the zip or also in this repo for your
+convenience). Some simple summary stats would be good here.*
 
-Try some more linear regressions. Explain if there is a plausible causal
-link from X variables to Y and not the reverse. Explain what additional
-restrictions to put on the dataset (eg just prime age, just females,
-just college degree, whatever).
+You’ve got to be able to manage your data.
 
-Explain your results, giving details about the estimation and providing
-any relevant graphics. What are the changes from what you’d previously
-found (with k-nn or averages) and why might this be so? How do changes
-in specification (e.g. logs) change the estimated coefficients? What are
-some relevant predicted values? Do those seem sensible? What additional
-information would be useful? Impress me.
+### Example of effect of major
+
+Here is some code that shows the relationship of major to earnings,
+among majors offered here,
+
+``` r
+compare_fields <- (   (acs2021$DEGFIELDD == "Civil Engineering") |
+                  (acs2021$DEGFIELDD == "Electrical Engineering") |
+                  (acs2021$DEGFIELDD == "Mechanical Engineering") |
+                  (acs2021$DEGFIELDD == "Computer Science") | 
+                  (acs2021$DEGFIELDD == "Psychology") |
+                  (acs2021$DEGFIELDD == "Political Science and Government") |
+                  (acs2021$DEGFIELDD == "Economics") |
+                  (acs2021$EDUC == "Grade 12")  )
+
+acs_compare_f <- acs2021 %>% filter((compare_fields & (AGE >= 25) & (AGE <= 65)) )
+
+acs_compare_f$DEGFIELDD <- fct_drop(acs_compare_f$DEGFIELDD)
+
+
+acs_compare_f$degree_recode <- recode_factor(acs_compare_f$DEGFIELDD, 
+                                            "Economics" = "Econ",
+                                            "Civil Engineering" = "Engr",
+                                            "Electrical Engineering" = "Engr",
+                                            "Mechanical Engineering" = "Engr",
+                                            "Computer Science" = "CS",
+                                            "Political Science and Government" = "PoliSci",
+                                            "Psychology" = "Psych",
+                                            .default = "HS")
+
+
+p_age_income <- ggplot(data = acs_compare_f,
+                       mapping = aes(x = AGE,
+                                     y = INCWAGE,
+                                     color = degree_recode,
+                                     fill = degree_recode))
+
+p_age_income + geom_smooth(aes(color=degree_recode, fill=degree_recode)) + 
+  scale_color_viridis_d(option = "inferno", end = 0.85) + 
+  scale_fill_viridis_d(option = "inferno", end = 0.65) + 
+  labs(x = "Age", y = "Income",color = "field") + guides(fill = "none")
+```
+
+![](lab5_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+That shows earnings over different ages. Econ majors have the highest
+earnings, followed by Engineering, then Computer Science (although they
+start highest) and the rest of the majors. You might have a lot of
+questions about that, including *why?*, *how?*, and *really?!* You will
+dig into those with some regressions.
+
+### Note on coding
+
+I want you to advance your coding. The following bits of code do the
+same thing:
+
+``` r
+attach(acs2021)
+model_v1 <- lm(INCWAGE ~ AGE)
+detach()
+
+model_v2 <- lm(acs2021$INCWAGE ~ acs2021$AGE)
+
+model_v3 <- lm(INCWAGE ~ AGE, data = acs2021)
+```
+
+I prefer the last one, v3. I think v2 is too verbose (especially once
+you have dozens of variables in your model) while v1 is liable to errors
+since, if the `attach` command gets too far separated from the `lm()`
+within your code chunks, can have unintended consequences. Later you
+will be doing robustness checks, where you do the same regression on
+slightly different subsets. (For example, compare a model fit on all
+people 18-65 vs people 25-55 vs other age ranges.) In that case v3
+becomes less verbose as well as less liable to have mistakes.
+
+However specifying the dataset, as with v3, means that any preliminary
+data transformations should modify the original dataset. So if you
+create `newvarb <- f(oldvarb)`, you have to carefully set
+`dataset$newvarb <- f(dataset$oldvarb)` and think about which dataset
+gets that transformation. The coding forces you to think about which
+dataset gets the transformation, which is good.
+
+While we’ve used ‘attach’ and ‘detach’ previously (and, whew boy,
+everybody sometimes has trouble with cleaning up *detach* after a bunch
+of *attach* commands!) I think it’s time to take off the training wheels
+and rampdown your use of ‘attach’ and ‘detach’.
+
+### For the lab
+
+Try a regression with age and age-squared in addition to your other
+controls, something like this:
+
+``` r
+lm((INCWAGE ~ Age + I(Age^2) + ... ) )
+```
+
+What is the peak of predicted wage? What if you add higher order
+polynomials of age, such as $`Age^3`$ or $`Age^4`$? Do a hypothesis test
+of whether all of those higher-order polynomial terms are *jointly*
+significant. Describe the pattern of predicted wage as a function of
+age. What if you used $`log(Age)`$? (And why would polynomials in
+$`log(Age)`$ be useless? Experiment.)
+
+Recall about how dummy variables work. If you added educ_hs in a
+regression using the subset given above, what would that do?
+(Experiment, if you aren’t sure.) What is interpretation of coefficient
+on *educ_college* in that subset? What would happen if you put both
+*educ_college* and *educ_advdeg* into a regression? Are your other dummy
+variables in the regression working sensibly with your selection
+criteria?
+
+Why don’t we use polynomial terms of dummy variables? Experiment.
+
+What is the predicted wage, from your model, for a few relevant cases?
+Do those seem reasonable?
+
+What is difference in regression from using log wage as the dependent
+variable? Compare the pattern of predicted values from the two models
+(remember to take exp() of the predicted value, where the dependent is
+log wage). Discuss.
+
+Try some interactions, like this,
+
+``` r
+lm(INCWAGE ~ Age + I(Age^2) + female + I(female*Age) + I(female*(Age^2) + ... ) 
+```
+
+and explain those outputs (different peaks for different groups).
+
+What are the other variables you are using in your regression? Do they
+have the expected signs and patterns of significance? Explain if there
+is a plausible causal link from X variables to Y and not the reverse.
+Explain your results, giving details about the estimation, some
+predicted values, and providing any relevant graphics. Impress.

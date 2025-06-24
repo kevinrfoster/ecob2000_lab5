@@ -1,10 +1,10 @@
 ---
 title: "Lab 5"
-output: html_document
+output: github_document
 ---
 ### Econ B2000, MA Econometrics
 ### Kevin R Foster, the Colin Powell School at the City College of New York, CUNY
-### Fall 2024
+### Fall 2025
 
 For this lab, we improve some of our regression models to explain wages.
 
@@ -16,6 +16,7 @@ We will use a new dataset, the American Community Survey (ACS) from the US Censu
 library(ggplot2)
 library(tidyverse)
 library(haven)
+library(viridis)
 
 setwd("..//ACS_2021_PUMS//") # your directory structure will be different
 load("acs2021_recoded.RData")
@@ -34,7 +35,7 @@ One option is to just take a random subsample, for instance, here we randomly se
 ```{r eval=FALSE}
 set.seed(12345)
 NN_obs <- length(acs2021$AGE)
-select1 <- (runif(NN_obs) < 0.5)
+select1 <- (runif(NN_obs) < 0.50)
 smaller_data <- subset(acs2021,select1)
 
 ```
@@ -50,8 +51,11 @@ Now that has just `r prettyNum(length(acs_coll$AGE), big.mark = ",")` observatio
 You might want a smaller subsample. Maybe something like this,
 ```{r eval=FALSE}
 acs_subgroup <- acs2021 %>% filter((AGE >= 25) & (AGE <= 55) & 
-                                     (LABFORCE == 2) & (WKSWORK2 > 4) & (UHRSWORK >= 35) &
-                                     (Hispanic == 1) & (female == 1) & 
+                                     (LABFORCE == 2) & 
+                                     (WKSWORK2 > 4) & 
+                                     (UHRSWORK >= 35) &
+                                     (Hispanic == 1) & 
+                                     (female == 1) & 
                                      ((educ_college == 1) | (educ_advdeg == 1)))
 ```
 Which would be people between 25 and 55 (so-called prime age), who are in the labor force, working full year, usually fulltime, who are Hispanic females with a college degree. If you start from a really big dataset, then you can drill far down.
@@ -65,44 +69,51 @@ Here is some code that shows the relationship of major to earnings, among majors
 
 ```{r message=FALSE}
 
-cps_fields <- (acs_coll$DEGFIELDD == "Economics") | 
-  (acs_coll$DEGFIELDD == "Political Science and Government") |
-  (acs_coll$DEGFIELDD == "Business Management and Administration") | 
-  (acs_coll$DEGFIELDD == "Psychology") | 
-  (acs_coll$DEGFIELDD == "Sociology") | 
-  (acs_coll$DEGFIELDD == "Anthropology and Archeology") | 
-  (acs_coll$DEGFIELDD == "International Relations")
+compare_fields <- (   (acs2021$DEGFIELDD == "Civil Engineering") |
+                  (acs2021$DEGFIELDD == "Electrical Engineering") |
+                  (acs2021$DEGFIELDD == "Mechanical Engineering") |
+                  (acs2021$DEGFIELDD == "Computer Science") | 
+                  (acs2021$DEGFIELDD == "Psychology") |
+                  (acs2021$DEGFIELDD == "Political Science and Government") |
+                  (acs2021$DEGFIELDD == "Economics") |
+                  (acs2021$EDUC == "Grade 12")  )
+
+acs_compare_f <- acs2021 %>% filter((compare_fields & (AGE >= 25) & (AGE <= 65)) )
+
+acs_compare_f$DEGFIELDD <- fct_drop(acs_compare_f$DEGFIELDD)
 
 
-acs_cps <- acs_coll %>% filter( (cps_fields) & (acs_coll$AGE>=25) & (acs_coll$AGE<=65) )
-acs_cps$DEGFIELDD <- fct_drop(acs_cps$DEGFIELDD)
+acs_compare_f$degree_recode <- recode_factor(acs_compare_f$DEGFIELDD, 
+                                            "Economics" = "Econ",
+                                            "Civil Engineering" = "Engr",
+                                            "Electrical Engineering" = "Engr",
+                                            "Mechanical Engineering" = "Engr",
+                                            "Computer Science" = "CS",
+                                            "Political Science and Government" = "PoliSci",
+                                            "Psychology" = "Psych",
+                                            .default = "HS")
 
-acs_cps$degree_recode <- fct_recode(acs_cps$DEGFIELDD, 
-                                    "Econ" = "Economics",
-                                    "PoliSci" = "Political Science and Government",
-                                    "PoliSci" = "International Relations",
-                                    "Business" = "Business Management and Administration",
-                                    "Psych" = "Psychology",
-                                    "Soc" = "Sociology",
-                                    "Anth" = "Anthropology and Archeology")
-acs_cps$degree_recode <- fct_relevel(acs_cps$degree_recode, "Econ", "PoliSci", "Business") 
 
-p_age_income <- ggplot(data = acs_cps,
+p_age_income <- ggplot(data = acs_compare_f,
                        mapping = aes(x = AGE,
                                      y = INCWAGE,
                                      color = degree_recode,
                                      fill = degree_recode))
+
 p_age_income + geom_smooth(aes(color=degree_recode, fill=degree_recode)) + 
-  scale_color_viridis_d(option = "inferno", end = 0.85) + scale_fill_viridis_d(option = "inferno", end = 0.75) + 
-  labs(x = "Age", y = "Income", color = "field") + guides(fill = "none")
+  scale_color_viridis_d(option = "inferno", end = 0.85) + 
+  scale_fill_viridis_d(option = "inferno", end = 0.65) + 
+  labs(x = "Age", y = "Income",color = "field") + guides(fill = "none")
+
 
 ```
 
-That shows earnings over different ages. Econ majors have the highest earnings, followed by PoliSci, then Business and the rest of the majors. You might have a lot of questions about that, including *why?*, *how?*, and *really?!* You will dig into those with some regressions.
+That shows earnings over different ages. Econ majors have the highest earnings, followed by Engineering, then Computer Science (although they start highest) and the rest of the majors. You might have a lot of questions about that, including *why?*, *how?*, and *really?!* You will dig into those with some regressions.
 
 ### Note on coding
 I want you to advance your coding. The following bits of code do the same thing:
 ```{r eval=FALSE}
+
 attach(acs2021)
 model_v1 <- lm(INCWAGE ~ AGE)
 detach()
