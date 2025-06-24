@@ -133,7 +133,7 @@ p_age_income + geom_smooth(aes(color=degree_recode, fill=degree_recode)) +
   labs(x = "Age", y = "Income",color = "field") + guides(fill = "none")
 ```
 
-![](lab5_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](unnamed-chunk-6-1.png)<!-- -->
 
 That shows earnings over different ages. Econ majors have the highest
 earnings, followed by Engineering, then Computer Science (although they
