@@ -1,1 +1,139 @@
+Lab 4
+================
 
+### Econ B2000, MA Econometrics
+
+### Kevin R Foster, the Colin Powell School at the City College of New York, CUNY
+
+### Fall 2025
+
+Start in small groups and consider a very simple model, where we
+consider to what degree a student’s previous grade predicts their
+subsequent grade, for instance in Principles of Microeconomics and then
+in Intermediate Microeconomics.
+
+``` math
+
+SubsequentGrade = f(PreviousGrade) + \epsilon 
+```
+With the group, please sketch what you would expect that function to
+look like. Is it reasonable for that to be a line? Would you think it
+had some curve? Would you expect it to be an increasing function? If it
+were a line, what would you expect to be reasonable values of alpha and
+beta here?
+
+``` math
+
+SubsequentGrade = \alpha + \beta PreviousGrade + \epsilon 
+```
+
+Each group will talk about their proposed model.
+
+Next, groups will create linear regression models of wages, in an
+attempt to understand the importance of a college degree. These sort of
+regressions are commonly called “Mincer” models after Jacob Mincer who
+developed them.
+
+We will use the Household Pulse Survey data. Which is not ideal since
+earnings are grouped together – but the tradeoff would be to reacquaint
+yourself with a different dataset. (later in the course)
+
+Groups should prepare a 4-min presentation by one of the group members
+about their experiment process and results. You get 85 min to prepare.
+Next homework assignment will ask you to go deeper.
+
+Make sure you’re stepping up your coding – at minimum, by now you should
+have your code as R-Script (in top left panel of R Studio) so that you
+can easily see what you run (CTRL-Enter is an easy shortcut). If you get
+significant errors then stop and re-run your code from a fresh start
+(clear memory, re-load data) so that you don’t pile one mistake on top
+of another. When you submit homework, I’ll want to see a file with your
+code and another with the output from that code. It would be even better
+to submit an R-Markdown file with code and text, where text tells the
+story clearly, along with that output – but I understand that not
+everybody is that far along yet.
+
+As you begin the analysis, you should first consider what subgroup to
+use – for example, you could run code like this,
+
+``` r
+prime_age_laborforce_data <- d_HHP2020_24 %>% filter(!is.na(work_kind) &
+                                                          Age >= 25 & Age <= 55)
+```
+
+This selects people 25-55 (often called prime age) who are working.
+Otherwise the regression would be trying to explain why so many people
+make zero wages despite so many qualifications. (Think through: if you
+include retirees in the data and estimate a linear model of age
+affecting wage, what would you expect for the sign of the coefficient on
+age?)
+
+Make sure you run `summary()` to check for obvious mistakes. Maybe some
+crosstabs to also look.
+
+First, *before running a regression,* consider what variables should be
+in your model. What are some of the important factors that influence a
+person’s wage? Is there a plausible causal link from X variables to Y
+and not the reverse?
+
+Now try a linear regression, with wage as the dependent variable,
+education, age, and other variables of your choice.
+
+Here is some sample code,
+
+``` r
+model_1 <- lm(income_midpoint ~ Age + Gender + Education + Race + Hispanic, 
+              data = prime_age_laborforce_data)
+summary(model_1)
+
+# maybe get fancy
+library(modelsummary)
+modelsummary(model_1, stars = TRUE, gof_map = c("nobs", "r.squared"))
+```
+
+For many of the hypothesis tests, you’ll want the AER package
+
+``` r
+library(AER)
+```
+
+Consider some predicted values.
+
+``` r
+# change this line to fit your choices about explanatory variables
+to_be_predicted1 <- data.frame(Age = 25:55, Gender = "female",
+                               Education = "adv degree",
+                               Race = "Black", 
+                               Hispanic = "Hispanic")
+to_be_predicted1$yhat <- predict(model_1, newdata = to_be_predicted1)
+```
+
+Create some more, for different X-values.
+
+Note that R makes it really really easy to run a regression model. You
+should quickly be thinking like an economist and noting that easy things
+don’t get much value – you’ll need to be able to do hard things, to
+create value.
+
+Carefully explain the hypothesis tests of each coefficient and all of
+the coefficients jointly. For each coefficient, explain the t-stat,
+p-value, and confidence interval.
+
+You might show how heteroskedasticity-consistent standard errors, as
+with `coeftest(model1,vcovHC)`, would affect each of these.
+
+Try both `lm(income_midpoint ~ ...` and `lm(log(income_midpoint) ~ ...`
+Compare mean of predicted values of first version with exp(x) mean of
+predicted values of second version. Discuss.
+
+Try some more linear regressions. Explain if there is a plausible causal
+link from X variables to Y and not the reverse. Explain what additional
+restrictions to put on the dataset (eg just prime age, just females,
+just college degree, whatever).
+
+Explain your results, giving details about the estimation and providing
+any relevant graphics. What are the changes from what you’d previously
+found (with k-nn or averages) and why might this be so? How do changes
+in specification (e.g. logs) change the estimated coefficients? What are
+some relevant predicted values? Do those seem sensible? What additional
+information would be useful? Impress me.
